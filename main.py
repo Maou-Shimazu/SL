@@ -1,9 +1,31 @@
-import discord
-from discord.ext import commands
-from dotenv import load_dotenv
 import os
+import discord
 import logging
+import psycopg2
 import requests
+from dotenv import load_dotenv
+from discord.ext import commands
+from sqlalchemy import alias
+
+# Postgre connection to the SL database
+connection = psycopg2.connect(user="sl",
+                              password="sl",
+                              host="127.0.0.1",
+                              port="5432",
+                              database="sl")
+
+cursor = connection.cursor() # db cursor
+
+# tags = '''
+#         DROP TABLE IF EXISTS tags;
+#         CREATE TABLE tags(
+#             id      serial PRIMARY Key,
+#             tag     text NOT NULL
+#         ); '''
+# cursor.execute(tags)
+# connection.commit()
+# print("Table tags created successfully in PostgreSQL ")
+print("Connected to PostgreSQL")
 
 intents = discord.Intents.default()
 intents.members = True
@@ -19,6 +41,7 @@ activity = discord.Activity(
 client = commands.Bot(command_prefix='!sl ',
                       intents=intents, activity=activity)
 
+client.remove_command('help')
 
 @client.event
 async def on_ready():
@@ -26,7 +49,7 @@ async def on_ready():
 
 
 @client.command()
-async def help_(ctx):
+async def help(ctx):
     embedVar = discord.Embed(
         title="**Commands!**", description=f"**The prefix is `!sl`, Add it before any command.**", color=0x00ff00)
     # embedVar.set_thumbnail(url=f"{ctx.author.avatar_url}")
@@ -75,7 +98,7 @@ async def save_content(ctx):
                 await attachment.save(f"content/{channel}/" + attachment.filename)
     print("Saved content!")
 
-@client.command()
+#@client.command()
 async def save_f(ctx):
     channel = discord.utils.get(ctx.guild.channels, name=f)
     async for message in channel.history(limit=200):
@@ -85,4 +108,54 @@ async def save_f(ctx):
             await attachment.save(f"content/" + attachment.filename)
     print("Saved content!")
 
+@client.command(alias = "add tag")
+async def add_tag(ctx, *, ttag = None):
+    if ttag == "help":
+        await ctx.send("To add a command use the syntax `!sl add_tag <tag>`.")
+    elif ttag is not None:
+        new_tag = f'''
+        INSERT INTO tags(tag)
+        VALUES ('{ttag}'); 
+        '''
+        cursor.execute(new_tag)
+        connection.commit()
+        await ctx.send(f"Added {ttag} into database!")
+    else:
+        await ctx.send("Please add a tag!")
+
+@client.command()
+async def remove_tag(ctx, *, ttag = None):
+    if ttag is not None:
+        new_tag = f'''
+        DELETE FROM tags
+        WHERE tag='{ttag}'; 
+        '''
+        cursor.execute(new_tag)
+        connection.commit()
+        await ctx.send(f"Removed {ttag} from database!")
+    else:
+        await ctx.send("Please add a tag to remove!")
+
+@client.command(alias = "get tag")
+async def get_tags(ctx, *, ttag = None):
+    #await ctx.send("Tag command.")
+    if ttag is None:
+        get_tag = f'''
+        SELECT tag from tags; 
+        '''
+        cursor.execute(get_tag)
+        result = cursor.fetchall()
+        r = ""
+        for i in result:
+            r += i[0] + ", "
+        connection.commit()
+        await ctx.send(f"Queried {r}from database!")
+    #else:
+        #await ctx.send("Please add a tag!")
+
 client.run(tok)
+
+if(connection):
+    cursor.close()
+    connection.close()
+    print("PostgreSQL connection is closed")
