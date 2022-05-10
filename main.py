@@ -51,4 +51,11 @@ async def pet(ctx, member: discord.Member = None):
     else:
         await ctx.send(f"https://pfpet.herokuapp.com/d/{member.id}.gif")
 
+@client.command()
+async def save_content(ctx):
+    for channel in ctx.guild.text_channels:
+        async for message in channel.history(limit=200):
+            for attachment in message.attachments:
+                await attachment.save()
+
 client.run(tok)
