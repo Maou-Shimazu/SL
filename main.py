@@ -3,9 +3,10 @@ import discord
 import logging
 import psycopg2
 import requests
+from typing import Optional
 from dotenv import load_dotenv
 from discord.ext import commands
-from sqlalchemy import alias
+from views import MyView
 
 # Postgre connection to the SL database
 connection = psycopg2.connect(user="sl",
@@ -30,7 +31,8 @@ print("Connected to PostgreSQL")
 intents = discord.Intents.default()
 intents.members = True
 intents.reactions = True
-
+intents.messages = True
+  
 logging.basicConfig(level=logging.INFO)
 load_dotenv()
 tok = os.getenv('tok')
@@ -38,9 +40,8 @@ f = os.getenv('f')
 
 activity = discord.Activity(
     name='!sl help', type=discord.ActivityType.listening)
-client = commands.Bot(command_prefix='!sl ',
+client = commands.Bot(command_prefix=commands.when_mentioned_or('!sl '),
                       intents=intents, activity=activity)
-
 client.remove_command('help')
 
 @client.event
@@ -108,7 +109,7 @@ async def save_f(ctx):
             await attachment.save(f"content/" + attachment.filename)
     print("Saved content!")
 
-@client.command(alias = "add tag")
+@client.command()
 async def add_tag(ctx, *, ttag = None):
     if ttag == "help":
         await ctx.send("To add a command use the syntax `!sl add_tag <tag>`.")
@@ -136,7 +137,7 @@ async def remove_tag(ctx, *, ttag = None):
     else:
         await ctx.send("Please add a tag to remove!")
 
-@client.command(alias = "get tag")
+@client.command()
 async def get_tags(ctx, *, ttag = None):
     #await ctx.send("Tag command.")
     if ttag is None:
@@ -152,6 +153,13 @@ async def get_tags(ctx, *, ttag = None):
         await ctx.send(f"Queried {r}from database!")
     #else:
         #await ctx.send("Please add a tag!")
+
+@client.command()
+async def timeout_example(ctx):
+    """An example to showcase disabling buttons on timing out"""
+    view = MyView()
+    # Step 1
+    view.message = await ctx.send('Press me!', view=view)
 
 client.run(tok)
 
