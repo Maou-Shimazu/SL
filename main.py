@@ -39,10 +39,11 @@ tok = os.getenv('tok')
 f = os.getenv('f')
 
 activity = discord.Activity(
-    name='!sl help', type=discord.ActivityType.listening)
-#commands.when_mentioned_or('!!')
-client = commands.Bot(command_prefix=commands.when_mentioned_or('!sl '), intents=intents, activity=activity)
-client.remove_command('help')
+    name='!! help', type=discord.ActivityType.listening)
+#commands.when_mentioned_or('!s ')
+client = commands.Bot(command_prefix = '!! ', intents=discord.Intents.default(), activity=activity, help_command=None)
+client.case_insensitive = True
+#client.remove_command('help')
 
 @client.event
 async def on_ready():
@@ -50,7 +51,7 @@ async def on_ready():
 
 
 @client.command()
-async def help(ctx):
+async def _help(ctx):
     embedVar = discord.Embed(
         title="**Commands!**", description=f"**The prefix is `!sl`, Add it before any command.**", color=0x00ff00)
     # embedVar.set_thumbnail(url=f"{ctx.author.avatar_url}")
