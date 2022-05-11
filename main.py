@@ -6,7 +6,7 @@ import requests
 from typing import Optional
 from dotenv import load_dotenv
 from discord.ext import commands
-from views import MyView
+import views
 
 # Postgre connection to the SL database
 connection = psycopg2.connect(user="sl",
@@ -40,8 +40,8 @@ f = os.getenv('f')
 
 activity = discord.Activity(
     name='!sl help', type=discord.ActivityType.listening)
-client = commands.Bot(command_prefix=commands.when_mentioned_or('!sl '),
-                      intents=intents, activity=activity)
+#commands.when_mentioned_or('!!')
+client = commands.Bot(command_prefix=commands.when_mentioned_or('!sl '), intents=intents, activity=activity)
 client.remove_command('help')
 
 @client.event
@@ -157,9 +157,13 @@ async def get_tags(ctx, *, ttag = None):
 @client.command()
 async def timeout_example(ctx):
     """An example to showcase disabling buttons on timing out"""
-    view = MyView()
+    view = views.MyView()
     # Step 1
     view.message = await ctx.send('Press me!', view=view)
+
+@client.command()
+async def invite(ctx: commands.Context):
+    await ctx.send(f'Invite link!', view=views.Invite())
 
 client.run(tok)
 
