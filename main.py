@@ -37,11 +37,11 @@ logging.basicConfig(level=logging.INFO)
 load_dotenv()
 tok = os.getenv('tok')
 f = os.getenv('f')
-
+prefixes: tuple = ("!s ", "!!")
 activity = discord.Activity(
     name='!! help', type=discord.ActivityType.listening)
 #commands.when_mentioned_or('!s ')
-client = commands.Bot(command_prefix = '!! ', intents=discord.Intents.default(), activity=activity, help_command=None)
+client = commands.Bot(command_prefix=commands.when_mentioned_or(*prefixes), intents=discord.Intents.default(), activity=activity)
 client.case_insensitive = True
 #client.remove_command('help')
 
