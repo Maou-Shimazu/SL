@@ -92,8 +92,9 @@ async def bonk(ctx, member: discord.Member = None):
 
 @client.command()
 async def save_content(ctx):
+    print("saving content")
     for channel in ctx.guild.text_channels:
-        async for message in channel.history(limit=200):
+        async for message in channel.history(limit=1000):
             for attachment in message.attachments:
                 if not os.path.exists(f"content/{channel}"):
                     os.mkdir(f"content/{channel}")
