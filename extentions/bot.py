@@ -5,6 +5,7 @@ from discord.ext import commands
 from pytz import utc
 import requests
 
+
 class Bot(commands.Bot):
     __slots__ = ("extentions", "sheduler")
 
@@ -47,14 +48,12 @@ class Bot(commands.Bot):
 
     async def on_member_join(self, member):
         print(f'{member} Joined the server!')
-        embedVar = discord.Embed(
+        embed_var = discord.Embed(
             title="Welcome!",
             description=requests.get("https://sl-greeting-api.maou-shimazu.repl.co").headers["greeting"].replace(
                 "<USER>", f"**{member.display_name}**"),
             color=0x00ff00
         )
-        embedVar.set_thumbnail(url=f"{member.display_avatar}")
+        embed_var.set_thumbnail(url=f"{member.display_avatar}")
         channel = self.get_channel(878110758867705976)
-        await channel.send(embed=embedVar)
-    
-    
+        await channel.send(embed=embed_var)
