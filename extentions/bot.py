@@ -7,9 +7,10 @@ import requests
 
 
 class Bot(commands.Bot):
-    __slots__ = ("extentions", "sheduler")
+    __slots__ = ("ready", "extentions", "sheduler")
 
     def __init__(self) -> None:
+        self.ready = False
         self.extentions = [p.stem for p in Path(".").parent.glob("**/*.py")]
         self.sheduler = AsyncIOScheduler(timezone=utc)
 
@@ -17,6 +18,7 @@ class Bot(commands.Bot):
             command_prefix="!!",
             status=discord.Status.online,
             intents=discord.Intents.all(),
+            case_insensitive=True
         )
 
     def setup(self) -> None:
@@ -42,9 +44,16 @@ class Bot(commands.Bot):
         print(f"Bot Disconnected.")
 
     async def on_ready(self) -> None:
+        if not self.ready:
+            return
+
+        self.sheduler.start()
+        self.guilds = self.get_guild(844329823655690270)
+
         print("Logged in as {0.user}".format(self))
         await self.change_presence(activity=discord.Activity(
             name="!!help", type=discord.ActivityType.listening))
+        self.ready = True
 
     async def on_member_join(self, member):
         print(f'{member} Joined the server!')
@@ -57,3 +66,18 @@ class Bot(commands.Bot):
         embed_var.set_thumbnail(url=f"{member.display_avatar}")
         channel = self.get_channel(878110758867705976)
         await channel.send(embed=embed_var)
+
+    async def on_message(self, message: discord.Message, /) -> None:
+        if message.author.bot or isinstance(message.channel, discord.DMChannel):
+            return
+        await self.process_commands(message)
+
+    async def process_commands(self, message: discord.Message, /) -> None:
+        ctx = await self.get_context(message, cls=commands.Context)
+        if ctx.command is None:
+            return
+        await self.invoke(ctx)
+
+
+
+    
