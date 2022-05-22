@@ -58,22 +58,6 @@ async def _help(ctx):
     await ctx.send(embed=embedVar)
 
 
-@client.event
-async def on_member_join(member):
-    print(f'{member} Joined the server!')
-    embedVar = discord.Embed(
-        title="Welcome!",
-        description=requests.get("https://random-hi.13-05.repl.co").headers["greeting"].replace(
-            "<USER>", f"**{member}**".split("#", 1)[0] + "**"),
-        color=0x00ff00
-    )
-    #description=f"Welcome To Shimazu Clan, **{member}**",
-    embedVar.set_thumbnail(url=f"{member.avatar_url}")
-    #channel = discord.utils.get(member.guild.text_channels, name="general")
-    channel = client.get_channel(878110758867705976)
-    await channel.send(embed=embedVar)
-
-
 @client.command()
 async def pet(ctx, member: discord.Member = None):
     if member is None:

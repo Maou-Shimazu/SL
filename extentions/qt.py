@@ -21,5 +21,5 @@ class Qt(commands.Cog):
     #     await message.add_reaction(R_ID)
 
 
-def setup(bot: Bot):
+def setup(bot: Bot) -> None:
     bot.add_cog(Qt(bot))
