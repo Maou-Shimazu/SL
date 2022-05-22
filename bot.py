@@ -6,14 +6,14 @@ from pytz import utc
 import requests
 
 SHIMAZU_CLAN = 844329823655690270
-BOT_SPAM_CHANNEL_ID = None
+BOT_SPAM_CHANNEL_ID = 844335549225762816
 
 class Bot(commands.Bot):
     __slots__ = ("ready", "extentions", "scheduler")
 
     def __init__(self) -> None:
         self.ready = False
-        self.extentions = [p.stem for p in Path(".").parent.glob("**/*.py")]
+        self.extentions = [p.stem for p in Path(".").glob("./extentions/*.py")]
         self.scheduler = AsyncIOScheduler(timezone=utc)
 
         super().__init__(
@@ -25,8 +25,8 @@ class Bot(commands.Bot):
     def setup(self) -> None:
         print("Running setup...")
         for ext in self.extentions:
-            #self.load_extension(f"{ext}.py") # extention not found
-            print(f"`{ext}` loaded.")
+            self.load_extension(f"extentions.{ext}") # extention not found
+            print(f"`extentions.{ext}` loaded.")
 
     def run(self) -> None:
         self.setup()
