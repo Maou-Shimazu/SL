@@ -5,18 +5,19 @@ from discord.ext import commands
 from pytz import utc
 import requests
 
+SHIMAZU_CLAN = 844329823655690270
+BOT_SPAM_CHANNEL_ID = None
 
 class Bot(commands.Bot):
-    __slots__ = ("ready", "extentions", "sheduler")
+    __slots__ = ("ready", "extentions", "scheduler")
 
     def __init__(self) -> None:
         self.ready = False
         self.extentions = [p.stem for p in Path(".").parent.glob("**/*.py")]
-        self.sheduler = AsyncIOScheduler(timezone=utc)
+        self.scheduler = AsyncIOScheduler(timezone=utc)
 
         super().__init__(
             command_prefix="!!",
-            status=discord.Status.online,
             intents=discord.Intents.all(),
             case_insensitive=True
         )
@@ -24,7 +25,7 @@ class Bot(commands.Bot):
     def setup(self) -> None:
         print("Running setup...")
         for ext in self.extentions:
-            self.load_extension(f"extentions.{ext}")
+            #self.load_extension(f"{ext}.py") # extention not found
             print(f"`{ext}` loaded.")
 
     def run(self) -> None:
@@ -35,25 +36,30 @@ class Bot(commands.Bot):
         super().run(token, reconnect=True)
 
     async def close(self) -> None:
+        print("Shutting down...")
+        self.scheduler.shutdown();
         await super().close()
 
     async def on_connect(self) -> None:
-        print(f"Bot Connected! DWSP Latency: {self.latency * 100:,.0f} ms")
-
-    async def on_disconnect(self) -> None:
-        print(f"Bot Disconnected.")
-
-    async def on_ready(self) -> None:
-        if not self.ready:
-            return
-
-        self.sheduler.start()
-        self.guilds = self.get_guild(844329823655690270)
-
-        print("Logged in as {0.user}".format(self))
+        print(f" Bot Connected! DWSP Latency: {self.latency * 100:,.0f} ms")
         await self.change_presence(activity=discord.Activity(
             name="!!help", type=discord.ActivityType.listening))
+        print(" Presence updated.")
+
+
+    async def on_disconnect(self) -> None:
+        print(f" Bot Disconnected.")
+
+    async def on_ready(self) -> None:
+        if self.ready:
+            return
+
+        self.guild = self.get_guild(SHIMAZU_CLAN)
+        self.scheduler.start()
+        print(f" Sheduler started ({len(self.scheduler.get_jobs()):,} job(s) scheduled)")
+        print(" Logged in as {0.user}".format(self))
         self.ready = True
+        print(f" Bot ready!")
 
     async def on_member_join(self, member):
         print(f'{member} Joined the server!')
