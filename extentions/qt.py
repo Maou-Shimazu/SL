@@ -5,6 +5,7 @@ from bot import Bot
 MAOU_ID = 859581812246446081
 R_ID = "<:oke:879424724332073020>"
 
+
 class Qt(commands.Cog):
     __slots_ = {"bot"}
 

@@ -10,7 +10,7 @@ class Comms(commands.Bot):
         self.bot = bot
 
     @commands.Bot.command()
-    async def test():
+    async def test(self):
         print("This actually works.")
 
     @commands.Bot.command()
