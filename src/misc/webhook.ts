@@ -17,11 +17,3 @@ export function status(status: boolean) {
         });
     }
 }
-
-// export const data = new MessageButton()
-//     .setCustomId("primary")
-//     .setLabel("Add to server")
-//     .setStyle("PRIMARY")
-//     .setURL(
-//         "https://discord.com/api/oauth2/authorize?client_id=896585118787985478&permissions=8&scope=bot"
-//     );

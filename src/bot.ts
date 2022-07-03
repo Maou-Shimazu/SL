@@ -41,7 +41,6 @@ client.on("guildMemberAdd", async (interaction) => {
 });
 
 client.on("interactionCreate", async (interaction) => {
-    // on interaction:  depreciated
     if (!interaction.isCommand()) return;
     const { commandName } = interaction;
     commands[commandName].execute(interaction, client);
@@ -49,6 +48,11 @@ client.on("interactionCreate", async (interaction) => {
 
 client.on("messageCreate", async (message) => {
     if (message.author.bot) return;
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    if (message.mentions.has(client.user!)) {
+        await message.reply("Rival, Please, stfu, thank you.");
+     }
 
     let args: string[];
     if (message.guild) {
@@ -73,19 +77,34 @@ client.on("messageCreate", async (message) => {
 
     // commands
     if (command == "ping") {
-        message.reply(`Ping: ${client.ws.ping}ms`);
-        log.info(client.ws.status);
+        const api_results: number[] = [];
+        const sent = await message.reply({
+            content: "Pinging...",
+        });
+        for (const i in [...Array(5).keys()]) {
+            await new Promise((resolve) => setTimeout(resolve, 1000)).then(() => {
+                sent.edit(`Pinging... ${i}`);
+                api_results.push((sent.createdTimestamp - client.ws.ping) - message.createdTimestamp ); // still dosent send proper api results
+            });
+        }
+        log.info(api_results);
+        sent.edit(
+            `**Ping: **: ${client.ws.ping}ms\n**Lowest:** ${Math.min(
+                ...api_results
+            )}ms\n**Highest:** ${Math.max(
+                ...api_results
+            )}ms\n**Roundtrip latency**: ${
+                sent.createdTimestamp - message.createdTimestamp
+            }ms`
+        );
     }
 });
 
-// dosent work
-client.on("presenceUpdate", async bot => {
-    if (bot?.user?.bot) {
-        if (bot.clientStatus !== "online") {
-            log.info("Bot is offline!");
-            status(false);
-        }
-    }
+process.on("SIGINT", function() {
+    log.info("Caught interrupt signal");
+    log.info("Bot is offline!");
+    status(false);
+    client.destroy();
 });
 
 client.login(config.BOT_TOKEN);

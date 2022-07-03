@@ -8,45 +8,13 @@ import requests
 SHIMAZU_CLAN = 844329823655690270
 BOT_SPAM_CHANNEL_ID = 844335549225762816
 
-
 class Bot(commands.Bot):
-    __slots__ = ("ready", "extentions", "scheduler")
-
-    def __init__(self) -> None:
-        self.ready = False
-        self.extentions = [p.stem for p in Path(".").glob("./extentions/*.py")]
-        self.scheduler = AsyncIOScheduler(timezone=utc)
-
-        super().__init__(
-            command_prefix="!!",
-            intents=discord.Intents.all(),
-            case_insensitive=True,
-            help_command=None
-        )
-
-    def setup(self) -> None:
-        print("Running setup...")
-        for ext in self.extentions:
-            self.load_extension(f"extentions.{ext}")  # extention not found
-            print(f"`extentions.{ext}` loaded.")
-
-    def run(self) -> None:
-        self.setup()
-        print("Running bot...")
-        with open("token", "r") as f:
-            token = f.read()
-        super().run(token, reconnect=True)
 
     async def close(self) -> None:
         print("Shutting down...")
         self.scheduler.shutdown();
         await super().close()
 
-    async def on_connect(self) -> None:
-        print(f" Bot Connected! DWSP Latency: {self.latency * 100:,.0f} ms")
-        await self.change_presence(activity=discord.Activity(
-            name="!!help", type=discord.ActivityType.listening))
-        print(" Presence updated.")
 
     async def on_disconnect(self) -> None:
         print(f" Bot Disconnected.")
