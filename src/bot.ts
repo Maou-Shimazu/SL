@@ -3,10 +3,12 @@ import { config } from "./config";
 import { log } from "./logger";
 import * as commandModules from "./commands";
 import * as componentModules from "./components";
+import * as prefix from "./prefix-commands";
 import { status } from "./misc/webhook";
 
 const components = Object(componentModules);
 const commands = Object(commandModules);
+const prefixCommands = Object(prefix);
 
 export const client = new Client({
     intents: ["GUILDS", "GUILD_MEMBERS", "GUILD_MESSAGES", "DIRECT_MESSAGES"],
@@ -35,7 +37,7 @@ client.on("guildMemberAdd", async (interaction) => {
     else
         await (
             await channel.send({
-                embeds: [components["embeds"].welcomeEmbed(interaction)], // check if valid
+                embeds: [components["embeds"].welcomeEmbed(interaction)],
             })
         ).react("👋");
 });
@@ -73,31 +75,9 @@ client.on("messageCreate", async (message) => {
     }
 
     // const command = shift()?.toLowerCase();
-    const command = args[0].toLowerCase();
-
-    // commands
-    if (command == "ping") {
-        const api_results: number[] = [];
-        const sent = await message.reply({
-            content: "Pinging...",
-        });
-        for (const i in [...Array(5).keys()]) {
-            await new Promise((resolve) => setTimeout(resolve, 1000)).then(() => {
-                sent.edit(`Pinging... ${i}`);
-                api_results.push((sent.createdTimestamp - client.ws.ping) - message.createdTimestamp ); // still dosent send proper api results
-            });
-        }
-        log.info(api_results);
-        sent.edit(
-            `**Ping: **: ${client.ws.ping}ms\n**Lowest:** ${Math.min(
-                ...api_results
-            )}ms\n**Highest:** ${Math.max(
-                ...api_results
-            )}ms\n**Roundtrip latency**: ${
-                sent.createdTimestamp - message.createdTimestamp
-            }ms`
-        );
-    }
+    const command: string = args[0].toLowerCase();
+    prefixCommands[command].execute(message, client);
+    log.info(command);
 });
 
 process.on("SIGINT", function() {
