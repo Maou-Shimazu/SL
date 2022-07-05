@@ -1,10 +1,11 @@
 import { Client, TextChannel } from "discord.js";
 import { config } from "./config";
 import { log } from "./logger";
+import { status } from "./misc/webhook";
+import * as uptime from "./misc/uptime";
 import * as commandModules from "./commands";
 import * as componentModules from "./components";
 import * as prefix from "./prefix-commands";
-import { status } from "./misc/webhook";
 
 const components = Object(componentModules);
 const commands = Object(commandModules);
@@ -27,6 +28,7 @@ client.once("ready", () => {
         status: "online",
     });
     status(true);
+    uptime.startUptimeCounter();
 });
 
 client.on("guildMemberAdd", async (interaction) => {
@@ -53,8 +55,8 @@ client.on("messageCreate", async (message) => {
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     if (message.mentions.has(client.user!)) {
-        await message.reply("Rival, Please, stfu, thank you.");
-     }
+        await message.reply("Hello esteamed, gentle-individual. The prefix for Shimazu Legends is `!sl`.");
+    }
 
     let args: string[];
     if (message.guild) {
@@ -76,11 +78,15 @@ client.on("messageCreate", async (message) => {
 
     // const command = shift()?.toLowerCase();
     const command: string = args[0].toLowerCase();
-    prefixCommands[command].execute(message, client);
+    if (!prefixCommands[command]) {
+        message.channel.send(`Command "${command}" not found.`);
+    } else {
+        prefixCommands[command].execute(message, client);
+    }
     log.info(command);
 });
 
-process.on("SIGINT", function() {
+process.on("SIGINT", function () {
     log.info("Caught interrupt signal");
     log.info("Bot is offline!");
     status(false);
