@@ -20,7 +20,7 @@ client.once("ready", () => {
     client.user?.setPresence({
         activities: [
             {
-                name: "prefix: !sl",
+                name: "prefix: !s",
                 type: "LISTENING",
                 url: "https://discord.com/api/oauth2/authorize?client_id=896585118787985478&permissions=8&scope=bot",
             },
@@ -55,7 +55,12 @@ client.on("messageCreate", async (message) => {
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     if (message.mentions.has(client.user!)) {
-        await message.reply("Hello esteamed, gentle-individual. The prefix for Shimazu Legends is `!sl`.");
+        await message.reply(
+            "Hello esteemed, gentle-individual. The prefix for Shimazu's Guardian is `!s`."
+        );
+    }
+    if (message.content.toLocaleLowerCase().includes("nigga")) {
+        message.delete();
     }
 
     let args: string[];
@@ -81,7 +86,7 @@ client.on("messageCreate", async (message) => {
     if (!prefixCommands[command]) {
         message.channel.send(`Command "${command}" not found.`);
     } else {
-        prefixCommands[command].execute(message, client);
+        prefixCommands[command].execute(message, client, args);
     }
     log.info(command);
 });

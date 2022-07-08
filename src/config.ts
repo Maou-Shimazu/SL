@@ -3,7 +3,7 @@ dotenv.config();
 
 const { CLIENT_ID, GUILD_ID, BOT_TOKEN } = process.env;
 
-const PREFIX = "!sl"; 
+const PREFIX = "!s"; 
 
 if (!CLIENT_ID || !GUILD_ID || !BOT_TOKEN) {
   throw new Error("Missing Environment Variables");

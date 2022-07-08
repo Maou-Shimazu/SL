@@ -10,6 +10,11 @@ export function about(uptime: string, msg: Message): MessageEmbed {
         .setColor("#0099ff")
         .setTitle("About Shimazu Legends")
         .setThumbnail(msg.client.user?.displayAvatarURL() as string)
-        .addField("Status", basicInfoRows.map(([label, value]) => `${label}: **${value}**`).join("\n"))
+        .addField(
+            "Status",
+            basicInfoRows
+                .map(([label, value]) => `${label}: **${value}**`)
+                .join("\n")
+        )
         .setTimestamp();
 }

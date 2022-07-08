@@ -8,12 +8,12 @@ export function status(status: boolean) {
     if (status) {
         webhk.send({
             content:
-                "🟢 <@859581812246446081>, <@896585118787985478> is online!",
+                "🟢 <@896585118787985478> is online!",
         });
     } else {
         webhk.send({
             content:
-                "⚪ <@859581812246446081>, <@896585118787985478> is offline!",
+                "⚪ <@896585118787985478> is offline!",
         });
     }
 }
