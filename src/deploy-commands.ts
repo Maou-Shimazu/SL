@@ -5,8 +5,8 @@ import { log } from "./logger";
 import * as commandModules from "./commands";
 
 type Command = {
-    data: unknown
-}
+    data: unknown;
+};
 
 const commands = [];
 
@@ -16,6 +16,8 @@ for (const module of Object.values<Command>(commandModules)) {
 
 const rest: REST = new REST().setToken(config.BOT_TOKEN);
 
-rest.put(Routes.applicationGuildCommands(config.CLIENT_ID, config.GUILD_ID), { body: commands }).then(() => {
-    log.info("Successfully registered application commands.");
-}).catch(log.error);
+rest.put(Routes.applicationCommands(config.CLIENT_ID), { body: commands })
+    .then(() => {
+        log.info("Successfully registered application commands.");
+    })
+    .catch(log.error);

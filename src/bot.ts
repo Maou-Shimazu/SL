@@ -88,10 +88,12 @@ client.on("messageCreate", async (message) => {
     } else {
         prefixCommands[command].execute(message, client, args);
     }
-    log.info(command);
+    log.info(
+        `User: "${message.author.username}" from "${message.guild?.name}" called command: "${command}"`
+    );
 });
 
-process.on("SIGINT", function () {
+process.on("SIGINT", () => {
     log.info("Caught interrupt signal");
     log.info("Bot is offline!");
     status(false);
